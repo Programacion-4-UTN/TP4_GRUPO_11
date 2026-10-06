@@ -2,7 +2,7 @@
 <%!
     // === Ajustá estos valores a tu MySQL ===
     private static final String DB_URL  = "jdbc:mysql://localhost:3306/SegurosGroup?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Buenos_Aires";
-    private static final String DB_USER = "admin";
+    private static final String DB_USER = "root";
     private static final String DB_PASS = "root";
 
     private Connection abrirConexion() throws Exception {
