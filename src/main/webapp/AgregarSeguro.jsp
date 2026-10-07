@@ -6,8 +6,6 @@
 <%
     String mensaje = "";
 
-
-    // Conseguir próximo ID
     Connection con = abrirConexion();
     Statement st = con.createStatement();
 
@@ -25,32 +23,41 @@
     st.close();
     con.close();
 
-
-    // guardar el seguro
     if (request.getParameter("btnAceptar") != null) {
 
-        String descripcion = request.getParameter("txtDescripcion");
-        int idTipo = Integer.parseInt(request.getParameter("ddlTipoSeguro"));
-        double costoContratacion = Double.parseDouble(request.getParameter("txtCostoContratacion"));
-        double costoAsegurado = Double.parseDouble(request.getParameter("txtCostoAsegurado"));
+        try {
+            String descripcion = request.getParameter("txtDescripcion");
+            int idTipo = Integer.parseInt(request.getParameter("ddlTipoSeguro"));
+            double costoContratacion = Double.parseDouble(request.getParameter("txtCostoContratacion"));
+            double costoAsegurado = Double.parseDouble(request.getParameter("txtCostoAsegurado"));
 
-        con = abrirConexion();
+            if (descripcion.length() <= 200) {
+            
+                con = abrirConexion();
 
-        String sql = "INSERT INTO seguros (descripcion, idTipo, costoContratacion, costoAsegurado) VALUES (?, ?, ?, ?)";
+                String sql = "INSERT INTO seguros (descripcion, idTipo, costoContratacion, costoAsegurado) VALUES (?, ?, ?, ?)";
 
-        PreparedStatement ps = con.prepareStatement(sql);
+                PreparedStatement ps = con.prepareStatement(sql);
 
-        ps.setString(1, descripcion);
-        ps.setInt(2, idTipo);
-        ps.setDouble(3, costoContratacion);
-        ps.setDouble(4, costoAsegurado);
+                ps.setString(1, descripcion);
+                ps.setInt(2, idTipo);
+                ps.setDouble(3, costoContratacion);
+                ps.setDouble(4, costoAsegurado);
 
-        ps.executeUpdate();
+                ps.executeUpdate();
 
-        ps.close();
-        con.close();
+                ps.close();
+                con.close();
 
-        mensaje = "Seguro agregado correctamente";
+                mensaje = "Seguro agregado correctamente";
+
+            } else {
+                mensaje = "Error: La descripción no puede tener más de 200 letras.";
+            }
+
+        } catch (Exception e) {
+            mensaje = "Error al guardar: Verifique que los costos sean números válidos.";
+        }
     }
 %>
 
@@ -80,7 +87,7 @@
         <br><br>
 
         Descripción:
-        <input type="text" name="txtDescripcion" required>
+        <input type="text" name="txtDescripcion" maxlength="200" required>
 
         <br><br>
 
@@ -116,12 +123,12 @@
         <br><br>
 
         Costo contratación:
-        <input type="text" name="txtCostoContratacion" required>
+        <input type="number" step="0.01" name="txtCostoContratacion" required>
 
         <br><br>
 
         Costo Máximo Asegurado:
-        <input type="text" name="txtCostoAsegurado" required>
+        <input type="number" step="0.01" name="txtCostoAsegurado" required>
 
         <br><br>
 
