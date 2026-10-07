@@ -1,20 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ include file="db-connection.jsp" %>
 <%
-    int totalSeguros = 0;
-    int totalTipos = 0;
-    String error = null;
-    try (Connection cn = abrirConexion();
-         Statement st = cn.createStatement()) {
-        try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM seguros")) {
-            if (rs.next()) totalSeguros = rs.getInt(1);
-        }
-        try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM tipoSeguros")) {
-            if (rs.next()) totalTipos = rs.getInt(1);
-        }
-    } catch (Exception e) {
-        error = e.getMessage();
-    }
+    // Recibimos los datos que nos va a mandar el ServletInicio
+    Integer totalSeguros = (Integer) request.getAttribute("totalSeguros");
+    Integer totalTipos = (Integer) request.getAttribute("totalTipos");
+    String error = (String) request.getAttribute("error");
+    
+    // Si entran directo al JSP y los valores son nulos, les ponemos 0 por defecto
+    if(totalSeguros == null) totalSeguros = 0;
+    if(totalTipos == null) totalTipos = 0;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,20 +19,24 @@
  
     <div class="contenido">
         
- <nav>
-    <h1>Seguros Group</h1>
-    <a href="Inicio.jsp">Inicio</a> |
-    <a href="AgregarSeguro.jsp">Agregar Seguros</a> |
-    <a href="ListarSeguros.jsp">Listar Seguros</a>
-    <a href="EliminarSeguro.jsp">Eliminar Seguros</a>
-</nav>
-<hr>
+        <nav>
+            <h1>Seguros Group</h1>
+            <!--  Apunta a servlet en lugar de .jsp -->
+            <a href="ServletInicio">Inicio</a> |
+            <a href="ServletAgregarSeguro">Agregar Seguros</a> |
+            <a href="ServletListarSeguros">Listar Seguros</a> |
+            <a href="ServletEliminarSeguro">Eliminar Seguros</a>
+        </nav>
+        <hr>
+        
         <p>Soy la página de inicio</p>
+        
         <% if (error != null) { %>
-            <p class="error">No se pudo conectar a la base de datos: <%= esc(error) %></p>
+            <p class="error" style="color: red;">No se pudo conectar a la base de datos: <%= error %></p>
         <% } else { %>
             <p>Hay <b><%= totalSeguros %></b> seguros cargados en <b><%= totalTipos %></b> tipos de seguro.</p>
         <% } %>
+        
     </div>
 </body>
 </html>

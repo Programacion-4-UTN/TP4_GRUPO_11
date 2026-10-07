@@ -1,62 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="db-connection.jsp" %>
-
+<%@ page import="dominio.Seguro" %>
 <%
-    String mensaje = "";
-    boolean seguroEncontrado = false;
-    
-    String idBusqueda = "";
-    String desc = "";
-    String tipoDesc = "";
-    double costoC = 0;
-    double costoA = 0;
-
-    if (request.getParameter("btnBuscar") != null) {
-        idBusqueda = request.getParameter("txtIdSeguro");
-        
-        Connection con = abrirConexion();
-        String sql = "SELECT s.descripcion, t.descripcion as tipo, s.costoContratacion, s.costoAsegurado " +
-                     "FROM seguros s INNER JOIN tipoSeguros t ON s.idTipo = t.idTipo " +
-                     "WHERE s.idSeguro = ?";
-        
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, Integer.parseInt(idBusqueda));
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            seguroEncontrado = true;
-            desc = rs.getString("descripcion");
-            tipoDesc = rs.getString("tipo");
-            costoC = rs.getDouble("costoContratacion");
-            costoA = rs.getDouble("costoAsegurado");
-        } else {
-            mensaje = "No se encontró el seguro.";
-        }
-        
-        rs.close(); 
-        ps.close(); 
-        con.close();
-    }
-
-    if (request.getParameter("btnEliminar") != null) {
-        String idEliminar = request.getParameter("txtIdOculto");
-        
-        Connection con = abrirConexion();
-        String sql = "DELETE FROM seguros WHERE idSeguro = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, Integer.parseInt(idEliminar));
-        
-        int filas = ps.executeUpdate();
-        
-        ps.close(); 
-        con.close();
-        
-        if (filas > 0) {
-            mensaje = "Seguro eliminado.";
-        }
-    }
+    String mensaje = (String) request.getAttribute("mensaje");
+    Seguro seguroBuscado = (Seguro) request.getAttribute("seguroBuscado");
 %>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,43 +11,39 @@
     <title>Eliminar Seguro</title>
 </head>
 <body>
-
-    <a href="Inicio.jsp">Inicio</a> |
-    <a href="AgregarSeguro.jsp">Agregar Seguros</a> |
-    <a href="ListarSeguros.jsp">Listar Seguros</a> |
-    <a href="EliminarSeguro.jsp">Eliminar Seguro</a>
+    <nav>
+        <h1>Seguros Group</h1>
+        <a href="ServletInicio">Inicio</a> |
+        <a href="ServletAgregarSeguro">Agregar Seguros</a> |
+        <a href="ServletListarSeguros">Listar Seguros</a> |
+        <a href="ServletEliminarSeguro">Eliminar Seguro</a>
+    </nav>
+    <hr>
 
     <h2>Eliminar Seguro</h2>
     
-    <p><%= mensaje %></p>
+    <p style="color: red;"><%= mensaje != null ? mensaje : "" %></p>
 
-    <% if (seguroEncontrado == false) { %>
-    
-        <form method="post">
+    <% if (seguroBuscado == null) { %>
+        <form method="post" action="ServletEliminarSeguro">
             ID del Seguro:
-            <input type="text" name="txtIdSeguro">
+            <input type="text" name="txtIdSeguro" required>
             <input type="submit" name="btnBuscar" value="Buscar">
         </form>
-        
     <% } else { %>
-    
-        <form method="post">
-            <input type="hidden" name="txtIdOculto" value="<%= idBusqueda %>">
-            
+        <form method="post" action="ServletEliminarSeguro">
+            <input type="hidden" name="txtIdOculto" value="<%= seguroBuscado.getIdSeguro() %>">
             <ul>
-                <li>ID Seguro: <%= idBusqueda %></li>
-                <li>Descripción: <%= desc %></li>
-                <li>Tipo: <%= tipoDesc %></li>
-                <li>Costo Contratación: $<%= costoC %></li>
-                <li>Costo Asegurado: $<%= costoA %></li>
+                <li>ID Seguro: <%= seguroBuscado.getIdSeguro() %></li>
+                <li>Descripción: <%= seguroBuscado.getDescripcion() %></li>
+                <li>Tipo: <%= seguroBuscado.getDescripcionTipo() %></li>
+                <li>Costo Contratación: $<%= seguroBuscado.getCostoContratacion() %></li>
+                <li>Costo Asegurado: $<%= seguroBuscado.getCostoAsegurado() %></li>
             </ul>
-            
             <br>
             <input type="submit" name="btnEliminar" value="Eliminar">
-            <a href="EliminarSeguro.jsp">Cancelar</a>
+            <a href="ServletEliminarSeguro">Cancelar</a>
         </form>
-        
     <% } %>
-
 </body>
 </html>
