@@ -31,6 +31,7 @@
     <a href="Inicio.jsp">Inicio</a> |
     <a href="AgregarSeguro.jsp">Agregar Seguros</a> |
     <a href="ListarSeguros.jsp">Listar Seguros</a>
+    <a href="EliminarSeguro.jsp">Eliminar Seguros</a>
 </nav>
 <hr>
         <p>Soy la página de inicio</p>
